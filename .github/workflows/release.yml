@@ -1,0 +1,60 @@
+# Builds the Doppio disk image.
+#
+# - Push a tag like v1.2.0: tests, packages, and publishes a GitHub release with the .dmg attached.
+# - Run it by hand (Actions tab > Release > Run workflow): tests and packages only,
+#   and uploads the .dmg as a workflow artifact. No release is published.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to create the release
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Test
+        run: swift test
+
+      - name: Work out version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="0.0.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Package
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: scripts/package-release.sh "$VERSION"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Doppio-${{ steps.version.outputs.version }}
+          path: build/Doppio-*.dmg*
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "build/Doppio-$VERSION.dmg" "build/Doppio-$VERSION.dmg.sha256" \
+            --title "Doppio $VERSION" \
+            --notes-file .github/release-notes.md \
+            --generate-notes

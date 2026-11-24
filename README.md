@@ -12,7 +12,13 @@ Doppio is a macOS menu bar app. It gives a GUI for `/usr/bin/caffeinate`.
 
 Doppio always shows the full `caffeinate` command. You can copy the command.
 
-## Install
+## Download
+
+Download the `.dmg` file from the [latest release](https://github.com/gordysc/doppio/releases/latest). The release page tells you how to install Doppio.
+
+**CAUTION:** Doppio does not have an Apple Developer ID signature. Thus macOS blocks Doppio the first time that you open it. To open Doppio, click **Open Anyway** in **System Settings** › **Privacy & Security**.
+
+## Build from source
 
 You must have macOS 15 or later, and Xcode with Swift 6.
 
@@ -29,6 +35,19 @@ Other `make` targets:
 | `make test` | Runs the unit tests. |
 | `make icon` | Makes `Resources/AppIcon.icns` again. |
 | `make clean` | Removes the build output. |
+| `make dmg VERSION=1.2.0` | Makes `build/Doppio-1.2.0.dmg` for Apple silicon and Intel Macs. |
+
+## Publish a release
+
+The `Release` workflow in GitHub Actions makes the release.
+
+1. Make sure that the `main` branch has the changes for the release.
+2. Type `git tag v1.2.0` with the new version number.
+3. Type `git push origin v1.2.0`.
+
+The workflow runs the tests and makes the `.dmg` file. Then it publishes a GitHub release with the `.dmg` file and its checksum.
+
+To make a test build without a release, open the **Actions** tab. Select **Release**, then click **Run workflow**. The `.dmg` file is in the artifacts of the run.
 
 ## How it works
 

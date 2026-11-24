@@ -1,4 +1,4 @@
-.PHONY: app install test icon run clean
+.PHONY: app install test icon run dmg clean
 
 app:        ## Build build/Doppio.app
 	scripts/build-app.sh
@@ -14,6 +14,9 @@ icon:       ## Regenerate Resources/AppIcon.icns
 
 run: app    ## Build and launch from build/
 	open build/Doppio.app
+
+dmg:        ## Build a universal DMG: make dmg VERSION=1.2.0
+	scripts/package-release.sh $(VERSION)
 
 clean:
 	rm -rf .build build
