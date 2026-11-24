@@ -53,3 +53,7 @@ If you change an assertion during a session, Doppio starts `caffeinate` again wi
 ## Code signing
 
 The build script signs the app ad hoc. To sign the app with a certificate, set `CODESIGN_IDENTITY` before you type `make app`.
+
+## License
+
+The MIT License applies to Doppio. Refer to the [`LICENSE`](LICENSE) file.
